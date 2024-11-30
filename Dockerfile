@@ -1,4 +1,8 @@
-# Dockerfile
+FROM --platform=linux/arm64 composer:latest AS composer
+WORKDIR /app
+COPY ./composer.* ./
+RUN composer install --ignore-platform-reqs --no-scripts --prefer-dist
+
 FROM --platform=linux/arm64 dunglas/frankenphp:latest-php8.2
 
 WORKDIR /app
@@ -8,15 +12,6 @@ RUN apt update && apt install -y \
     libzip-dev \
     unzip \
     && docker-php-ext-install zip
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Install Slim Framework
-
-COPY ./composer.json /app
-COPY ./composer.lock /app
-RUN composer install
 
 RUN install-php-extensions \
 	pdo_mysql \
@@ -33,6 +28,7 @@ RUN install-php-extensions \
   xdebug
 
 # Copy application files
+COPY --from=composer /app/vendor /app/vendor
 COPY ./Caddyfile /etc/caddy/Caddyfile
 
 
