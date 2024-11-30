@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    # build:
+    #   context: .
+    #   dockerfile: ./docker/Dockerfile
+    ports:
+      - "8080:80"
+      - "18080:443"
+      - "18080:443/udp"
+    volumes:
+      - ./:/app
